@@ -17,3 +17,4 @@ llm_usage.jsonl
 .ruff_cache/
 .DS_Store
 .libriscribe_last_config.json
+run.sh

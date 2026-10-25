@@ -72,7 +72,10 @@ class LLMClient:
             if not self.settings.openai_api_key:
                 raise ValueError("OpenAI API key is not set.")
             openai_module = _require_provider_dependency("openai", "openai")
-            client = openai_module.OpenAI(api_key=self.settings.openai_api_key)
+            client_kwargs = {"api_key": self.settings.openai_api_key}
+            if self.settings.openai_base_url:
+                client_kwargs["base_url"] = self.settings.openai_base_url
+            client = openai_module.OpenAI(**client_kwargs)
         elif provider == "claude":
             if not self.settings.claude_api_key:
                 raise ValueError("Claude API key is not set.")

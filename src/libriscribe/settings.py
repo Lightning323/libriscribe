@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     openai_api_key: str = ""  # Optional, can be empty
+    openai_base_url: str = ""
     openai_model: str = "gpt-4o-mini"
     google_ai_studio_api_key: str = ""
     google_ai_studio_model: str = "gemini-2.5-flash"
@@ -45,4 +46,3 @@ class Settings(BaseSettings):
     weaviate_api_key: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")  # type: ignore
-

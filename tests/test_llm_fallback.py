@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -42,6 +43,34 @@ class ScriptedLLMClient(LLMClient):
 
 
 class LLMFallbackTests(unittest.TestCase):
+    def test_openai_client_uses_configured_openai_compatible_base_url(self):
+        from libriscribe.settings import Settings
+
+        client_instance = Mock()
+        openai_module = SimpleNamespace(OpenAI=Mock(return_value=client_instance))
+        with patch.dict(
+            os.environ,
+            {
+                "OPENAI_API_KEY": "test-key",
+                "OPENAI_BASE_URL": "http://localhost:1234/v1",
+                "OPENAI_MODEL": "qwen/qwen3.8-27b",
+            },
+            clear=True,
+        ):
+            settings = Settings(_env_file=None)
+            with patch("libriscribe.utils.llm_client.Settings", return_value=settings):
+                with patch(
+                    "libriscribe.utils.llm_client._require_provider_dependency",
+                    return_value=openai_module,
+                ):
+                    client = LLMClient("openai")
+
+        openai_module.OpenAI.assert_called_once_with(
+            api_key="test-key",
+            base_url="http://localhost:1234/v1",
+        )
+        self.assertEqual(client.default_model, "qwen/qwen3.8-27b")
+
     def test_missing_provider_sdk_explains_the_optional_extra(self):
         with self.assertRaisesRegex(ImportError, r'libriscribe\[google\]'):
             with patch(
